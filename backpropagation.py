@@ -25,14 +25,14 @@ class BackPropagationNetwork:
             self.weights.append(np.random.normal(scale=0.01, size=(l2, l1+1)))
 
     #Run method
-    def Run(self, input):
+    def run(self, input):
         #Run network based on input data
 
         '''shape returns the no. of input data such that for:
             test = np.array([[1,2],[3,4],[5,6]])
             test.shape[0] returns 3, i.e. the no. of training cases
         '''
-        lnCases = input.shape[0]
+        InputCases = input.shape[0]
 
         #Clear out previous intermediate lists
         self._layerInput = []
@@ -42,12 +42,16 @@ class BackPropagationNetwork:
         #if its an input layer we need to get data from input
         #if its an output, otherwise
         for index in range(self.layerCount):
+            #Determine layer input
             if index == 0:
-                layerInput = self.weights[0].dot(np.vstack([input.T, np.ones([1, lnCases])]))
+                layerInput = self.weights[0].dot(np.vstack([input.T, np.ones([1, InputCases])]))
+            else:
+                layerInput = self.weights[index].dot(np.vstack([self._layerOutput[-1], np.ones([1, InputCases])]))
 
+            self._layerInput.append(layerInput)
+            self._layerOutput.append(self.sigmoid(layerInput))
 
-
-
+        return self._layerOutput[-1].T
 
     #Transfer function
     def sigmoid(self, x, Derivative=False):
@@ -59,5 +63,7 @@ class BackPropagationNetwork:
 
 if __name__ == "__main__":
     bpn = BackPropagationNetwork((2,2,1))
+    print(bpn.layerCount)
     print(bpn.shape)
+    # print(bpn.weights[0])
     print(bpn.weights)
